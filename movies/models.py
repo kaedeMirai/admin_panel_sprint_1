@@ -20,6 +20,7 @@ class UUIDMixin(models.Model):
 
 
 class Genre(UUIDMixin, TimeStampedMixin):
+
     name = models.CharField(max_length=255, verbose_name='Наименование')
     description = models.TextField(blank=True, verbose_name='Описание')
 
@@ -30,6 +31,19 @@ class Genre(UUIDMixin, TimeStampedMixin):
 
     def __str__(self) -> str:
         return self.name
+
+
+class Person(UUIDMixin, TimeStampedMixin):
+
+    full_name = models.CharField(max_length=255, verbose_name='ФИО')
+
+    class Meta:
+        db_table = "content\".\"person"
+        verbose_name = 'Персонаж'
+        verbose_name_plural = 'Персонажи'
+
+    def __str__(self) -> str:
+        return self.full_name
 
 
 class Filmwork(UUIDMixin, TimeStampedMixin):
@@ -46,6 +60,7 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
                                blank=True, verbose_name='Рейтинг')
     type = models.CharField(max_length=100, choices=CHOICE_TYPE, default='movie', verbose_name='Тип')
     genres = models.ManyToManyField(Genre, through='GenreFilmwork')
+    persons = models.ManyToManyField(Person, through='PersonFilmwork')
 
     class Meta:
         db_table = "content\".\"film_work"
@@ -64,18 +79,6 @@ class GenreFilmwork(UUIDMixin):
 
     class Meta:
         db_table = "content\".\"genre_film_work"
-
-
-class Person(UUIDMixin, TimeStampedMixin):
-
-    full_name = models.CharField(max_length=255, verbose_name='ФИО')
-
-    class Meta:
-        db_table = "content\".\"person"
-        verbose_name = ''
-
-    def __str__(self) -> str:
-        return self.full_name
 
 
 class PersonFilmwork(UUIDMixin):
