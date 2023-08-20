@@ -48,8 +48,8 @@ class Person(UUIDMixin, TimeStampedMixin):
 
 
 class FilmworkType(models.TextChoices):
-    MOVIE = 'movie', 'Фильм'
-    TV_SHOW = 'tv_show', 'ТВ-шоу'
+    MOVIE = 'movie', _('film')
+    TV_SHOW = 'tv_show', _('tv_show')
 
 
 class Filmwork(UUIDMixin, TimeStampedMixin):
