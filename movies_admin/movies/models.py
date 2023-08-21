@@ -6,8 +6,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class TimeStampedMixin(models.Model):
-    created = models.DateTimeField(auto_now_add=True, verbose_name='создан')
-    modified = models.DateTimeField(auto_now=True, verbose_name='изменён')
+    created = models.DateTimeField(auto_now_add=True, verbose_name=_('created'))
+    modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
 
     class Meta:
         abstract = True
@@ -49,7 +49,7 @@ class Person(UUIDMixin, TimeStampedMixin):
 
 class FilmworkType(models.TextChoices):
     MOVIE = 'movie', _('film')
-    TV_SHOW = 'tv_show', _('tv_show')
+    TV_SHOW = 'tv_show', _('tv show')
 
 
 class Filmwork(UUIDMixin, TimeStampedMixin):
@@ -69,7 +69,7 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
     persons = models.ManyToManyField(Person, through='PersonFilmwork')
 
     certificate = models.CharField(_('certificate'), max_length=512, blank=True)
-    file_path = models.FileField(_('file'), blank=True, null=True, upload_to='movies/')
+    file_path = models.FileField(_('file path'), blank=True, null=True, upload_to='movies/')
 
     class Meta:
         db_table = "content\".\"film_work"
@@ -88,8 +88,8 @@ class GenreFilmwork(UUIDMixin):
 
     class Meta:
         db_table = "content\".\"genre_film_work"
-        verbose_name = _('Genre')
-        verbose_name_plural = _('Genre')
+        verbose_name = _('genre')
+        verbose_name_plural = _('genre')
 
 
 class PersonFilmwork(UUIDMixin):
@@ -101,8 +101,8 @@ class PersonFilmwork(UUIDMixin):
 
     class Meta:
         db_table = "content\".\"person_film_work"
-        verbose_name = _('Person')
-        verbose_name_plural = _('Person')
+        verbose_name = _('person')
+        verbose_name_plural = _('person')
 
     def __str__(self) -> str:
         return self.person.full_name
