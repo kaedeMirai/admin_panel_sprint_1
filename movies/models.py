@@ -88,14 +88,21 @@ class GenreFilmwork(UUIDMixin):
 
     class Meta:
         db_table = "content\".\"genre_film_work"
+        verbose_name = _('Genre')
+        verbose_name_plural = _('Genre')
 
 
 class PersonFilmwork(UUIDMixin):
 
-    film_work = models.ForeignKey(Filmwork, on_delete=models.CASCADE)
-    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    film_work = models.ForeignKey(Filmwork, verbose_name=_('film'), on_delete=models.CASCADE)
+    person = models.ForeignKey(Person, verbose_name=_('person'), on_delete=models.CASCADE)
     role = models.TextField(null=True, verbose_name=_('role'))
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "content\".\"person_film_work"
+        verbose_name = _('Person')
+        verbose_name_plural = _('Person')
+
+    def __str__(self) -> str:
+        return self.person.full_name
