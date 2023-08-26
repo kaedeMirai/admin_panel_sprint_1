@@ -1,20 +1,79 @@
-import sqlite3
+import uuid
+from datetime import datetime, date
+from dataclasses import dataclass
+from data_from_sqlite import data_from_sqlite
+from data_to_postgre import insert_data_to_postgres
 
-import psycopg2
-from psycopg2.extensions import connection as _connection
-from psycopg2.extras import DictCursor
+
+@dataclass
+class Genre:
+    id: uuid.uuid4
+    name: str
+    description: str
+    created: datetime
+    modified: datetime
 
 
-def load_from_sqlite(connection: sqlite3.Connection, pg_conn: _connection):
-    """Основной метод загрузки данных из SQLite в Postgres"""
-    # postgres_saver = PostgresSaver(pg_conn)
-    # sqlite_extractor = SQLiteExtractor(connection)
+@dataclass
+class FilmWork:
+    id: uuid.uuid4
+    title: str
+    description: str
+    creation_date: date
+    file_path: str
+    rating: float
+    type: str
+    created: datetime
+    modified: datetime
 
-    # data = sqlite_extractor.extract_movies()
-    # postgres_saver.save_all_data(data)
+
+@dataclass
+class Person:
+    id: uuid.uuid4
+    full_name: str
+    created: datetime
+    modified: datetime
+
+
+@dataclass
+class PersonFilmWork:
+    id: uuid.uuid4
+    film_work_id: uuid.uuid4
+    person_id: uuid.uuid4
+    role: str
+    created: datetime
+
+
+@dataclass
+class GenreFilmWork:
+    id: uuid.uuid4
+    film_work_id: uuid.uuid4
+    genre_id: uuid.uuid4
+    created: datetime
 
 
 if __name__ == '__main__':
-    dsl = {'dbname': 'movies_database', 'user': 'app', 'password': '123qwe', 'host': '127.0.0.1', 'port': 5432}
-    with sqlite3.connect('db.sqlite') as sqlite_conn, psycopg2.connect(**dsl, cursor_factory=DictCursor) as pg_conn:
-        load_from_sqlite(sqlite_conn, pg_conn)
+    db_path = r'./sqlite_to_postgres/db.sqlite'
+    psql_conn_data = {
+        'dbname': 'movies_database',
+        'user': 'app',
+        'password': '123qwe',
+        'host': 'localhost',
+        'port': 54320,
+        'options': '-c search_path=content',
+        'client_encoding': 'utf-8',
+    }
+
+    table_mapping = {
+        'genre': Genre,
+        'film_work': FilmWork,
+        'person': Person,
+        'person_film_work': PersonFilmWork,
+        'genre_film_work': GenreFilmWork
+    }
+
+    for table_name, dataclass_type in table_mapping.items():
+        from_sqlite = data_from_sqlite(db_path, table_name, dataclass_type)
+        column_names = from_sqlite[1]
+        data = from_sqlite[0]
+        insert_data_to_postgres(data, table_name, column_names, psql_conn_data)

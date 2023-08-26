@@ -6,6 +6,10 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class TimeStampedMixin(models.Model):
+    """
+    Абстрактный класс, который добавляет повторяющиеся поля
+    "создания" и "изменения" в модели.
+    """
     created = models.DateTimeField(auto_now_add=True, verbose_name=_('created'))
     modified = models.DateTimeField(auto_now=True, verbose_name=_('modified'))
 
@@ -14,6 +18,10 @@ class TimeStampedMixin(models.Model):
 
 
 class UUIDMixin(models.Model):
+    """
+    Абстрактный класс, который добавляет повторяющееся поле uuid
+    в качестве первичного ключа к модели.
+    """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     class Meta:
@@ -21,7 +29,9 @@ class UUIDMixin(models.Model):
 
 
 class Genre(UUIDMixin, TimeStampedMixin):
-
+    """
+    Модель django, представляющая жанр кинопроизведения.
+    """
     name = models.CharField(max_length=255, verbose_name=_('name'))
     description = models.TextField(blank=True, verbose_name=_('description'))
 
@@ -35,7 +45,9 @@ class Genre(UUIDMixin, TimeStampedMixin):
 
 
 class Person(UUIDMixin, TimeStampedMixin):
-
+    """
+    Модель, содержащая персонажа, участника кинопроизведения в определённой роли.
+    """
     full_name = models.CharField(max_length=255, verbose_name=_('full name'))
 
     class Meta:
@@ -53,7 +65,9 @@ class FilmworkType(models.TextChoices):
 
 
 class Filmwork(UUIDMixin, TimeStampedMixin):
-
+    """
+    Модель, содержащая кинопроизведение.
+    """
     title = models.CharField(max_length=255, verbose_name=_('title'))
     description = models.TextField(blank=True, verbose_name=_('description'))
     creation_date = models.DateField(blank=True, verbose_name=_('creation date'))
@@ -68,7 +82,6 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
     genres = models.ManyToManyField(Genre, through='GenreFilmwork')
     persons = models.ManyToManyField(Person, through='PersonFilmwork')
 
-    certificate = models.CharField(_('certificate'), max_length=512, blank=True)
     file_path = models.FileField(_('file path'), blank=True, null=True, upload_to='movies/')
 
     class Meta:
@@ -81,7 +94,9 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
 
 
 class GenreFilmwork(UUIDMixin):
-
+    """
+    Промежуточная модель, результат связи manytomany, связующая фильм и жанр.
+    """
     film_work = models.ForeignKey(Filmwork, verbose_name=_('film'), on_delete=models.CASCADE)
     genre = models.ForeignKey(Genre, verbose_name=_('genre'), on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
@@ -93,7 +108,9 @@ class GenreFilmwork(UUIDMixin):
 
 
 class PersonFilmwork(UUIDMixin):
-
+    """
+    Промежуточная модель, результат связи manytomany, связующая фильм и персонажа.
+    """
     film_work = models.ForeignKey(Filmwork, verbose_name=_('film'), on_delete=models.CASCADE)
     person = models.ForeignKey(Person, verbose_name=_('person'), on_delete=models.CASCADE)
     role = models.TextField(null=True, verbose_name=_('role'))
