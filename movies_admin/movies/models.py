@@ -39,6 +39,9 @@ class Genre(UUIDMixin, TimeStampedMixin):
         db_table = "content\".\"genre"
         verbose_name = _('genre')
         verbose_name_plural = _('genres')
+        indexes = [
+            models.Index(fields=['name'])
+        ]
 
     def __str__(self) -> str:
         return self.name
@@ -54,6 +57,9 @@ class Person(UUIDMixin, TimeStampedMixin):
         db_table = "content\".\"person"
         verbose_name = _('person')
         verbose_name_plural = _('persons')
+        indexes = [
+            models.Index(fields=['full_name'])
+        ]
 
     def __str__(self) -> str:
         return self.full_name
@@ -88,6 +94,9 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
         db_table = "content\".\"film_work"
         verbose_name = _('film')
         verbose_name_plural = _('films')
+        indexes = [
+            models.Index(fields=['creation_date'])
+        ]
 
     def __str__(self) -> str:
         return self.title
@@ -107,19 +116,34 @@ class GenreFilmwork(UUIDMixin):
         verbose_name_plural = _('genre')
 
 
+class PersonRole(models.TextChoices):
+    DIRECTOR = 'director', _('director')
+    SCREENWRITER = 'screenwriter', _('screenwriter')
+    ACTOR = 'actor', _('actor')
+
+
 class PersonFilmwork(UUIDMixin):
     """
     Промежуточная модель, результат связи manytomany, связующая фильм и персонажа.
     """
     film_work = models.ForeignKey(Filmwork, verbose_name=_('film'), on_delete=models.CASCADE)
     person = models.ForeignKey(Person, verbose_name=_('person'), on_delete=models.CASCADE)
-    role = models.TextField(null=True, verbose_name=_('role'))
+    role = models.CharField(
+        null=True,
+        choices=PersonRole.choices,
+        default=PersonRole.ACTOR,
+        verbose_name=_('role')
+        )
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "content\".\"person_film_work"
         verbose_name = _('person')
         verbose_name_plural = _('person')
+        indexes = [
+            models.Index(fields=['film_work']),
+            models.Index(fields=['person'])
+        ]
 
     def __str__(self) -> str:
         return self.person.full_name
