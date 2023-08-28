@@ -1,6 +1,7 @@
 import uuid
 
 from django.db import models
+from django.db.models import UniqueConstraint
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -114,6 +115,9 @@ class GenreFilmwork(UUIDMixin):
         db_table = "content\".\"genre_film_work"
         verbose_name = _('genre')
         verbose_name_plural = _('genre')
+        constraints = [
+            UniqueConstraint(fields=['film_work', 'genre'], name='film_work_genre_idx')
+        ]
 
 
 class PersonRole(models.TextChoices):
@@ -142,7 +146,10 @@ class PersonFilmwork(UUIDMixin):
         verbose_name_plural = _('person')
         indexes = [
             models.Index(fields=['film_work']),
-            models.Index(fields=['person'])
+            models.Index(fields=['person']),
+        ]
+        constraints = [
+            UniqueConstraint(fields=['film_work', 'person', 'role'], name='film_work_person_idx')
         ]
 
     def __str__(self) -> str:
